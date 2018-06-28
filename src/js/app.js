@@ -10,7 +10,7 @@ if ('serviceWorker' in navigator) {
       }
     })
     .catch((err) => {
-      console.log("Could not register Service Worked", err);
+      console.log("Could not register Service Worker", err);
     })
 
 }
