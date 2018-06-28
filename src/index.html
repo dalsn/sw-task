@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Currency Converter - Free Bulma Template</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+  <section class="hero is-success is-fullheight">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title has-text-grey">Currency Converter</h3>
+          <p class="subtitle has-text-grey">Enter amount to convert</p>
+          <div class="box">
+            <figure class="avatar">
+              <img class="logo" src="imgs/currency-converter-hd-88.png">
+            </figure>
+              <div class="field">
+                <div class="control">
+                  <div class="select is-info is-fullwidth">
+                    <select id="currenciesFrom" required>
+                      <option value=''>From</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <div class="select is-info is-fullwidth">
+                    <select id="currenciesTo" required>
+                      <option value=''>To</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control is-expanded">
+                      <input class="input" type="text" placeholder="Amount" id="currencyFrom" autofocus="">
+                    </div>
+                  </div>
+                  <div class="field">
+                    <p class="control">
+                      <input class="input" type="text" placeholder="Rate" id="conversionRate" disabled>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <button class="button is-primary is-fullwidth" id="convert">Convert</button>
+              </div>
+              <div class="field">
+                <div class="control is-expanded">
+                  <input class="input is-rounded is-warning" type="text" placeholder="Value" id="currencyTo" readonly>
+                </div>
+              </div>
+          </div>
+          <article class="message is-warning">
+            <div class="message-body">
+              Built by <a href="http://dalhatu.com">Dalhatu Njidda</a></p> with <a href="https://currencyconverterapi.com">free.currencyconverterapi.com</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/javascript">
+    (() => {
+      getCurrencies()
+        .then(response => {
+          if (response) {
+            let selectFrom = document.getElementById('currenciesFrom');
+            let selectTo = document.getElementById('currenciesTo');
+            for(let item in response.results) {
+              let obj = response.results[item];
+              let option1 = document.createElement('option');
+              let option2 = document.createElement('option');
+              option1.text = `${obj.currencyName} (${obj.currencySymbol || obj.id})`;
+              option2.text = `${obj.currencyName} (${obj.currencySymbol || obj.id})`;
+              option1.value = obj.id;
+              option2.value = obj.id;
+              selectFrom.add(option1);
+              selectTo.add(option2);
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
+      let button = document.getElementById('convert');
+      button.addEventListener('click', (event) => {
+        let currencyFrom = document.getElementById('currenciesFrom').value;
+        let currencyTo = document.getElementById('currenciesTo').value;
+        let conversion1 = new CurrencyConversion(currencyFrom, currencyTo);
+        conversion1.convert()
+          .then(response => {
+            if (response) {
+              let obj = response.results[`${currencyFrom}_${currencyTo}`];
+              let fromElement = document.getElementById('currencyFrom');
+              let toElement = document.getElementById('currencyTo')
+              let rateElement = document.getElementById('conversionRate');
+
+              let value = fromElement.value * obj.val;
+              rateElement.value = obj.val;
+              toElement.value = parseFloat(parseFloat(value).toFixed(2)).toLocaleString('en-GB');
+            }
+          })
+          .catch(error => {
+            console.log("An error occurred during conversion: ", error);
+          });
+      });
+    })();
+  </script>
+</body>
+
+</html>
