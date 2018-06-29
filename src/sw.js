@@ -1,4 +1,4 @@
-let cacheName = 'currencyConverter-v1'; 
+let cacheName = 'currencyConverter-v1';
 
 let filesToCache = [
 	'./',
@@ -37,7 +37,7 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
 	let requestUrl = new URL(e.request.url);
-	if (requestUrl.protocol.startsWith('http')) {
+	if (requestUrl.protocol.startsWith('http') && !requestUrl.pathname.startsWith('/api/v5/convert')) {
 		e.respondWith(
 			caches.open(cacheName)
 				.then((cache) => {
@@ -57,8 +57,9 @@ self.addEventListener('fetch', (e) => {
 });
 
 self.addEventListener('message', (e) => {
-  if (e.data.action === 'skipWaiting') {
-    self.skipWaiting();
-    window.reload();
-  }
+	if (e.data.action === 'skipWaiting') {
+		self.skipWaiting();
+		let bool = confirm("There is an update available for download");
+		if (bool) location.reload();
+	}
 });

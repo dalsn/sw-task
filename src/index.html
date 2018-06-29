@@ -73,6 +73,7 @@
       </div>
     </div>
   </section>
+  <script type="text/javascript" src="js/idb.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
   <script type="text/javascript">
     (() => {
@@ -106,13 +107,12 @@
         conversion1.convert()
           .then(response => {
             if (response) {
-              let obj = response.results[`${currencyFrom}_${currencyTo}`];
               let fromElement = document.getElementById('currencyFrom');
               let toElement = document.getElementById('currencyTo')
               let rateElement = document.getElementById('conversionRate');
 
-              let value = fromElement.value * obj.val;
-              rateElement.value = obj.val;
+              let value = fromElement.value * response.val;
+              rateElement.value = response.val;
               toElement.value = parseFloat(parseFloat(value).toFixed(2)).toLocaleString('en-GB');
             }
           })

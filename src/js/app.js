@@ -21,6 +21,8 @@ let getCurrencies = () => {
 }
 
 let getResponse = (url) => {
+  //I'm using this because for some reason I couldn't figure out
+  //fetch() has refused to work as expected within this file
   return new Promise((resolve, reject) => {
 
     let xhr = new XMLHttpRequest();
@@ -38,7 +40,6 @@ let getResponse = (url) => {
 
     xhr.open("GET", url, true);
     xhr.send();
-
   }); 
 }
 
@@ -46,11 +47,51 @@ class CurrencyConversion {
   constructor(currencyFrom, currencyTo) {
     this.currencyFrom = currencyFrom;
     this.currencyTo = currencyTo;
+
+    if ('serviceWorker' in navigator) {
+      this.dbPromise = idb.open('currency', 1, (upgradeDb) => {
+        let store = upgradeDb.createObjectStore('currencies', {
+          keyPath: 'id'
+        });
+        store.createIndex('by-id', 'id');
+      });
+    }
   }
 
   convert() {
-    const url = `https://free.currencyconverterapi.com/api/v5/convert?q=${this.currencyFrom}_${this.currencyTo}`;
-    return getResponse(url);
+    const id = `${this.currencyFrom}_${this.currencyTo}`;
+
+    if (navigator.onLine) return this.getRate(id);
+
+    return this.dbPromise.then((db) => {
+      if (!db) return;
+
+      const tx = db.transaction('currencies', 'readwrite');
+      const index = tx.objectStore('currencies').index('by-id');
+
+      return index.get(id).then((response) => {
+        if (!response)
+          alert('No Internet connection found!');
+        return response;
+      })
+    })
+  }
+
+  getRate(id) {
+    const url = `https://free.currencyconverterapi.com/api/v5/convert?q=${id}`;
+
+    return this.dbPromise.then((db) => {
+      return getResponse(url).then((response) => {
+        let obj = response.results[`${this.currencyFrom}_${this.currencyTo}`];
+        if (!db) return obj;
+
+        const tx1 = db.transaction('currencies', 'readwrite');
+        const store1 = tx1.objectStore('currencies');
+        store1.put(obj);
+
+        return obj;
+      })
+    })
   }
 }
 
