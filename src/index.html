@@ -101,6 +101,7 @@
 
       let button = document.getElementById('convert');
       button.addEventListener('click', (event) => {
+        button.classList.add("is-loading");
         let currencyFrom = document.getElementById('currenciesFrom').value;
         let currencyTo = document.getElementById('currenciesTo').value;
         let conversion1 = new CurrencyConversion(currencyFrom, currencyTo);
@@ -114,10 +115,12 @@
               let value = fromElement.value * response.val;
               rateElement.value = response.val;
               toElement.value = parseFloat(parseFloat(value).toFixed(2)).toLocaleString('en-GB');
+              button.classList.remove("is-loading");
             }
           })
           .catch(error => {
             console.log("An error occurred during conversion: ", error);
+            button.classList.remove("is-loading");
           });
       });
     })();
