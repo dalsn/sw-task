@@ -16,13 +16,13 @@ if ('serviceWorker' in navigator) {
 }
 
 let getCurrencies = () => {
-  const url = `https://free.currencyconverterapi.com/api/v5/currencies`;
+  const url = `https://free.currconv.com/api/v7/currencies?apiKey=b42b01ab2c1f29eb112b`;
   return getResponse(url);
 }
 
 let getResponse = (url) => {
   //I'm using this because for some reason I couldn't figure out
-  //fetch() has refused to work as expected within this file
+  //why fetch() has refused to work as expected within this file
   return new Promise((resolve, reject) => {
 
     let xhr = new XMLHttpRequest();
@@ -47,6 +47,7 @@ class CurrencyConversion {
   constructor(currencyFrom, currencyTo) {
     this.currencyFrom = currencyFrom;
     this.currencyTo = currencyTo;
+    this.apiKey = 'b42b01ab2c1f29eb112b';
 
     if ('serviceWorker' in navigator) {
       this.dbPromise = idb.open('currency', 1, (upgradeDb) => {
@@ -78,7 +79,7 @@ class CurrencyConversion {
   }
 
   getRate(id) {
-    const url = `https://free.currencyconverterapi.com/api/v5/convert?q=${id}`;
+    const url = `https://free.currconv.com/api/v7/convert?apiKey=${this.apiKey}&q=${id}`;
 
     return this.dbPromise.then((db) => {
       return getResponse(url).then((response) => {
