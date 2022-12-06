@@ -6,7 +6,7 @@
   "devDependencies": {
     "gulp-util": "^3.0.7",
     "gulp": "^3.9.1",
-    "gulp-connect": "^2.3.1"
+    "gulp-connect": "^5.7.0"
   },
   "scripts": {
     "start": "gulp"
